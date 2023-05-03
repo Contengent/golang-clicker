@@ -14,6 +14,8 @@ import (
 type Game struct{}
 
 var number int = 0
+var minutePassing int = 0
+var cpsUpper int = 0
 
 var img *ebiten.Image
 
@@ -37,7 +39,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	increment()
+	clickIncrement()
+	makeCpsGoUp()
+	if minutePassing >= 60 {
+		cpsIncrement()
+		minutePassing = 0
+	}
+	
+	minutePassing = minutePassing + 1
 
 	return 320, 240
 }
@@ -50,9 +59,22 @@ func main() {
 	}
 }
 
-func increment() {
+
+
+func clickIncrement() {
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButton0) {
 		number = number + 1
 	}
 
+}
+
+func cpsIncrement() {
+	number = number + (1 * cpsUpper)
+}
+
+func makeCpsGoUp() {
+	if (inpututil.IsKeyJustPressed(ebiten.KeyQ)) && (number >= 20) {
+		number = number - 20
+		cpsUpper = cpsUpper + 1
+	}
 }
