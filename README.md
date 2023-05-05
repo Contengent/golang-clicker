@@ -1,2 +1,2 @@
 # golang-clicker
-simple clicker game being developed openly using the golang ebitengine game engine
+simple clicker game developed openly using the golang ebitengine game engine
