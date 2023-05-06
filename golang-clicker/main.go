@@ -47,10 +47,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	playerInformation =
 		"Current clicks: " + strconv.FormatFloat(number, 'f', 1, 64) +
-			"\n\nCurrent cps+(20): " + strconv.FormatFloat(cpsUpper, 'f', 1, 64) +
-			"\nCurrent cps*(2000): " + strconv.FormatFloat(cpsMultiplier, 'f', 1, 64) +
-			"\nCurrent cps^(200000): " + strconv.FormatFloat(cpsToThePower, 'f', 3, 64) +
-			"\n\n\n\n\n\n            Win! (20000000000 clicks)"
+			"\n\n[q]Current cps+ ($20): " + strconv.FormatFloat(cpsUpper, 'f', 1, 64) +
+			"\n[w]Current cps* ($5000): " + strconv.FormatFloat(cpsMultiplier, 'f', 1, 64) +
+			"\n[e]Current cps^ ($800000): " + strconv.FormatFloat(cpsToThePower, 'f', 3, 64) +
+			"\n\n\n\n\n\n            [r]Win! ($20000000000)"
 
 	ebitenutil.DebugPrint(screen, playerInformation)
 
@@ -98,11 +98,11 @@ func makeCpsGoUp() {
 	if (ebiten.IsKeyPressed(ebiten.KeyQ)) && (number >= 20) {
 		number = number - 20
 		cpsUpper = cpsUpper + 1
-	} else if (ebiten.IsKeyPressed(ebiten.KeyW)) && (number >= 2000) {
-		number = number - 2000
+	} else if (ebiten.IsKeyPressed(ebiten.KeyW)) && (number >= 5000) {
+		number = number - 5000
 		cpsMultiplier = cpsMultiplier + 0.5
-	} else if (ebiten.IsKeyPressed(ebiten.KeyE)) && (number >= 200000) {
-		number = number - 200000
+	} else if (ebiten.IsKeyPressed(ebiten.KeyE)) && (number >= 800000) {
+		number = number - 800000
 		cpsToThePower = cpsToThePower + 0.002
 	} else if (ebiten.IsKeyPressed(ebiten.KeyR)) && (number >= 20000000000) {
 		number = number - 20000000000
