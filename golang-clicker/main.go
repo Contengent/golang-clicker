@@ -14,8 +14,6 @@ import (
 
 type Game struct{}
 
-var minutePassing int = 0
-
 var number float64 = 0
 
 var cpsUpper float64 = 0
@@ -47,10 +45,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	playerInformation =
 		"Current clicks: " + strconv.FormatFloat(number, 'f', 1, 64) +
+			"\nCurrent cps: " + strconv.FormatFloat(math.Pow(((1*cpsUpper)*(cpsMultiplier)), cpsToThePower), 'f', 1, 64) +
 			"\n\n[q]Current cps+ ($20): " + strconv.FormatFloat(cpsUpper, 'f', 1, 64) +
 			"\n[w]Current cps* ($5000): " + strconv.FormatFloat(cpsMultiplier, 'f', 1, 64) +
 			"\n[e]Current cps^ ($800000): " + strconv.FormatFloat(cpsToThePower, 'f', 3, 64) +
-			"\n\n\n\n\n\n            [r]Win! ($20000000000)"
+			"\n\n\n\n\n\n            [r]Win! ($10000000000000000)"
 
 	ebitenutil.DebugPrint(screen, playerInformation)
 
@@ -65,12 +64,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	clickIncrement()
 	makeCpsGoUp()
-	if minutePassing >= 60 {
-		cpsIncrement()
-		minutePassing = 0
-	}
-
-	minutePassing = minutePassing + 1
+	cpsIncrement()
 
 	return 320, 240
 }
@@ -91,7 +85,7 @@ func clickIncrement() {
 }
 
 func cpsIncrement() {
-	number = number + math.Pow(((1*cpsUpper)*(cpsMultiplier)), cpsToThePower)
+	number = number + (math.Pow(((1*cpsUpper)*(cpsMultiplier)), cpsToThePower))/60
 }
 
 func makeCpsGoUp() {
@@ -104,8 +98,8 @@ func makeCpsGoUp() {
 	} else if (ebiten.IsKeyPressed(ebiten.KeyE)) && (number >= 800000) {
 		number = number - 800000
 		cpsToThePower = cpsToThePower + 0.002
-	} else if (ebiten.IsKeyPressed(ebiten.KeyR)) && (number >= 20000000000) {
-		number = number - 20000000000
+	} else if (ebiten.IsKeyPressed(ebiten.KeyR)) && (number >= 10000000000000000) {
+		number = number - 10000000000000000
 		creditCheck = true
 	}
 }
