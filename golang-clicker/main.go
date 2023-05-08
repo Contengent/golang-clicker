@@ -14,7 +14,7 @@ import (
 
 type Game struct{}
 
-var number float64 = 1234230
+var number float64 = 0
 
 var cpsUpper float64 = 0
 var cpsUpperPrice float64 = 20
@@ -74,7 +74,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 
 func main() {
 	ebiten.SetWindowSize(640, 480)
-	ebiten.SetWindowTitle("Golang Clicker game")
+	ebiten.SetWindowTitle("Golang clicker game")
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
 	}
