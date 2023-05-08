@@ -14,11 +14,14 @@ import (
 
 type Game struct{}
 
-var number float64 = 0
+var number float64 = 1234230
 
 var cpsUpper float64 = 0
+var cpsUpperPrice float64 = 20
 var cpsMultiplier float64 = 1
+var cpsMultiplierPrice float64 = 5000
 var cpsToThePower float64 = 1
+var cpsToThePowerPrice float64 = 800000
 var playerInformation string = ""
 var creditCheck bool = false
 
@@ -41,20 +44,20 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	op.GeoM.Translate(50, 50)
 	op.GeoM.Scale(0.4, 0.4)
 
-	screen.Fill(color.RGBA{0xff, 0, 0, 0xff})
+	screen.Fill(color.RGBA{0, 0, 0, 0xff})
 
 	playerInformation =
 		"Current clicks: " + strconv.FormatFloat(number, 'f', 1, 64) +
 			"\nCurrent cps: " + strconv.FormatFloat(math.Pow(((1*cpsUpper)*(cpsMultiplier)), cpsToThePower), 'f', 1, 64) +
-			"\n\n[q]Current cps+ ($20): " + strconv.FormatFloat(cpsUpper, 'f', 1, 64) +
-			"\n[w]Current cps* ($5000): " + strconv.FormatFloat(cpsMultiplier, 'f', 1, 64) +
-			"\n[e]Current cps^ ($800000): " + strconv.FormatFloat(cpsToThePower, 'f', 3, 64) +
-			"\n\n\n\n\n\n            [r]Win! ($10000000000000000)"
+			"\n\n[q] Current cps+ ($" + strconv.FormatFloat(cpsUpperPrice, 'f', 1, 64) + "): " + strconv.FormatFloat(cpsUpper, 'f', 1, 64) +
+			"\n[w] Current cps* ($" + strconv.FormatFloat(cpsMultiplierPrice, 'f', 1, 64) + "): " + strconv.FormatFloat(cpsMultiplier, 'f', 1, 64) +
+			"\n[e] Current cps^ ($" + strconv.FormatFloat(cpsToThePowerPrice, 'f', 1, 64) + "): " + strconv.FormatFloat(cpsToThePower, 'f', 2, 64) +
+			"\n\n\n\n\n\n           [r] Win! ($10000000000000000)"
 
 	ebitenutil.DebugPrint(screen, playerInformation)
 
 	if creditCheck {
-		screen.Fill(color.RGBA{0xff, 0, 0, 0xff})
+		screen.Fill(color.RGBA{0, 0, 0, 0xff})
 		screen.DrawImage(img, op)
 	}
 
@@ -71,7 +74,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 
 func main() {
 	ebiten.SetWindowSize(640, 480)
-	ebiten.SetWindowTitle("First project")
+	ebiten.SetWindowTitle("Golang Clicker game")
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
 	}
@@ -89,15 +92,18 @@ func cpsIncrement() {
 }
 
 func makeCpsGoUp() {
-	if (ebiten.IsKeyPressed(ebiten.KeyQ)) && (number >= 20) {
-		number = number - 20
+	if (ebiten.IsKeyPressed(ebiten.KeyQ)) && (number >= cpsUpperPrice) {
+		number = number - cpsUpperPrice
+		cpsUpperPrice = cpsUpperPrice * 1.005
 		cpsUpper = cpsUpper + 1
-	} else if (ebiten.IsKeyPressed(ebiten.KeyW)) && (number >= 5000) {
-		number = number - 5000
+	} else if (ebiten.IsKeyPressed(ebiten.KeyW)) && (number >= cpsMultiplierPrice) {
+		number = number - cpsMultiplierPrice
+		cpsMultiplierPrice = cpsMultiplierPrice * 1.03
 		cpsMultiplier = cpsMultiplier + 0.5
-	} else if (ebiten.IsKeyPressed(ebiten.KeyE)) && (number >= 800000) {
-		number = number - 800000
-		cpsToThePower = cpsToThePower + 0.002
+	} else if (ebiten.IsKeyPressed(ebiten.KeyE)) && (number >= cpsToThePowerPrice) {
+		number = number - cpsToThePowerPrice
+		cpsToThePowerPrice = cpsToThePowerPrice * 1.2
+		cpsToThePower = cpsToThePower + 0.05
 	} else if (ebiten.IsKeyPressed(ebiten.KeyR)) && (number >= 10000000000000000) {
 		number = number - 10000000000000000
 		creditCheck = true
