@@ -18,10 +18,20 @@ var number float64 = 0
 
 var cpsUpper float64 = 0
 var cpsUpperPrice float64 = 20
+var cpsUpperIncrement float64 = 1
+
 var cpsMultiplier float64 = 1
 var cpsMultiplierPrice float64 = 5000
+var cpsMultiplierIncrement float64 = 0.5
+
 var cpsToThePower float64 = 1
 var cpsToThePowerPrice float64 = 800000
+var cpsToThePowerIncrement float64 = 0.02
+
+var rebirths float64 = 0
+var rebirthPrice float64 = 1000000000
+
+var currentCps float64 = 0
 var playerInformation string = ""
 var creditCheck bool = false
 
@@ -48,11 +58,12 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	playerInformation =
 		"Current clicks: " + strconv.FormatFloat(number, 'f', 1, 64) +
-			"\nCurrent cps: " + strconv.FormatFloat(math.Pow(((1*cpsUpper)*(cpsMultiplier)), cpsToThePower), 'f', 1, 64) +
-			"\n\n[q] Current cps+ ($" + strconv.FormatFloat(cpsUpperPrice, 'f', 1, 64) + "): " + strconv.FormatFloat(cpsUpper, 'f', 1, 64) +
-			"\n[w] Current cps* ($" + strconv.FormatFloat(cpsMultiplierPrice, 'f', 1, 64) + "): " + strconv.FormatFloat(cpsMultiplier, 'f', 1, 64) +
-			"\n[e] Current cps^ ($" + strconv.FormatFloat(cpsToThePowerPrice, 'f', 1, 64) + "): " + strconv.FormatFloat(cpsToThePower, 'f', 2, 64) +
-			"\n\n\n\n\n\n           [r] Win! ($10000000000000000)"
+			"\nCurrent cps: " + strconv.FormatFloat((math.Pow(((cpsUpper)*(cpsMultiplier)), cpsToThePower))+((math.Pow(((cpsUpper)*(cpsMultiplier)), cpsToThePower))*(rebirths)), 'f', 1, 64) +
+			"\n\n[q] Current cps+ ($" + strconv.FormatFloat(cpsUpperPrice, 'f', 0, 64) + "): " + strconv.FormatFloat(cpsUpper, 'f', 0, 64) +
+			"\n[w] Current cps* ($" + strconv.FormatFloat(cpsMultiplierPrice, 'f', 0, 64) + "): " + strconv.FormatFloat(cpsMultiplier, 'f', 1, 64) +
+			"\n[e] Current cps^ ($" + strconv.FormatFloat(cpsToThePowerPrice, 'f', 0, 64) + "): " + strconv.FormatFloat(cpsToThePower, 'f', 2, 64) +
+			"\n[r] Rebirths cps+cps* ($" + strconv.FormatFloat(rebirthPrice, 'f', 0, 64) + "): " + strconv.FormatFloat(rebirths, 'f', 2, 64) +
+			"\n\n\n\n\n\n           [s] Win! ($999999999999999999)"
 
 	ebitenutil.DebugPrint(screen, playerInformation)
 
@@ -88,24 +99,38 @@ func clickIncrement() {
 }
 
 func cpsIncrement() {
-	number = number + (math.Pow(((1*cpsUpper)*(cpsMultiplier)), cpsToThePower))/60
+	number = number + ((math.Pow(((cpsUpper)*(cpsMultiplier)), cpsToThePower))+((math.Pow(((cpsUpper)*(cpsMultiplier)), cpsToThePower))*(rebirths)))/60
+}
+
+func rebirthing() {
+	number = 5000
+
+	cpsUpper = 0
+	cpsUpperPrice = 20
+	cpsMultiplier = 1
+	cpsMultiplierPrice = 5000
+	cpsToThePower = 111
+	cpsToThePowerPrice = 800000
 }
 
 func makeCpsGoUp() {
 	if (ebiten.IsKeyPressed(ebiten.KeyQ)) && (number >= cpsUpperPrice) {
 		number = number - cpsUpperPrice
 		cpsUpperPrice = cpsUpperPrice * 1.005
-		cpsUpper = cpsUpper + 1
+		cpsUpper = cpsUpper + cpsUpperIncrement
 	} else if (ebiten.IsKeyPressed(ebiten.KeyW)) && (number >= cpsMultiplierPrice) {
 		number = number - cpsMultiplierPrice
 		cpsMultiplierPrice = cpsMultiplierPrice * 1.03
-		cpsMultiplier = cpsMultiplier + 0.5
+		cpsMultiplier = cpsMultiplier + cpsMultiplierIncrement
 	} else if (ebiten.IsKeyPressed(ebiten.KeyE)) && (number >= cpsToThePowerPrice) {
 		number = number - cpsToThePowerPrice
-		cpsToThePowerPrice = cpsToThePowerPrice * 1.2
-		cpsToThePower = cpsToThePower + 0.05
-	} else if (ebiten.IsKeyPressed(ebiten.KeyR)) && (number >= 10000000000000000) {
-		number = number - 10000000000000000
+		cpsToThePowerPrice = math.Pow(cpsToThePowerPrice, 1.02)
+		cpsToThePower = cpsToThePower + cpsToThePowerIncrement
+	} else if (ebiten.IsKeyPressed(ebiten.KeyR)) && (number >= rebirthPrice) {
+		rebirths = rebirths + 0.5
+		rebirthing()
+
+	} else if (ebiten.IsKeyPressed(ebiten.KeyS)) && (number >= 999999999999999999) {
 		creditCheck = true
 	}
 }
