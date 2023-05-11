@@ -14,6 +14,22 @@ import (
 
 type Game struct{}
 
+/*
+var testButt ebitButton = ebitButton{
+	height: 110,
+	width:  110,
+	//xpos   float64
+	//ypos   float64
+
+	//fillColor    image.RGBA
+	//boarderColor image.RGBA
+
+	text: "string",
+
+	isPressed: false,
+}
+*/
+
 var number float64 = 0
 
 var cpsUpper float64 = 0
@@ -37,9 +53,13 @@ var creditCheck bool = false
 
 var img *ebiten.Image
 
+/* var img2 *ebiten.Image */
+
 func init() {
 	var err error
 	img, _, err = ebitenutil.NewImageFromFile("winner.png")
+	/*img2 = ebiten.NewImage(testButt.width, testButt.height) */
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,15 +75,17 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	op.GeoM.Scale(0.4, 0.4)
 
 	screen.Fill(color.RGBA{0, 0, 0, 0xff})
+	/*img2.Fill(color.RGBA{110, 100, 0, 0xff})*/
+	/*screen.DrawImage(img2, op)*/
 
 	playerInformation =
-		"Current clicks: " + strconv.FormatFloat(number, 'f', 1, 64) +
+		"Current clicks: " + numberFormatting(number) +
 			"\nCurrent cps: " + strconv.FormatFloat((math.Pow(((cpsUpper)*(cpsMultiplier)), cpsToThePower))+((math.Pow(((cpsUpper)*(cpsMultiplier)), cpsToThePower))*(rebirths)), 'f', 1, 64) +
-			"\n\n[q] Current cps+ ($" + strconv.FormatFloat(cpsUpperPrice, 'f', 0, 64) + "): " + strconv.FormatFloat(cpsUpper, 'f', 0, 64) +
-			"\n[w] Current cps* ($" + strconv.FormatFloat(cpsMultiplierPrice, 'f', 0, 64) + "): " + strconv.FormatFloat(cpsMultiplier, 'f', 1, 64) +
-			"\n[e] Current cps^ ($" + strconv.FormatFloat(cpsToThePowerPrice, 'f', 0, 64) + "): " + strconv.FormatFloat(cpsToThePower, 'f', 2, 64) +
-			"\n[r] Rebirths cps+cps* ($" + strconv.FormatFloat(rebirthPrice, 'f', 0, 64) + "): " + strconv.FormatFloat(rebirths, 'f', 2, 64) +
-			"\n\n\n\n\n\n           [s] Win! ($999999999999999999)"
+			"\n\n[q] Current cps+ ($" + numberFormatting(cpsUpperPrice) + "): " + numberFormatting(cpsUpper) +
+			"\n[w] Current cps* ($" + numberFormatting(cpsMultiplierPrice) + "): " + numberFormatting(cpsMultiplier) +
+			"\n[e] Current cps^ ($" + numberFormatting(cpsToThePowerPrice) + "): " + numberFormatting(cpsToThePower) +
+			"\n[r] Rebirths cps+cps* ($" + numberFormatting(rebirthPrice) + "): " + numberFormatting(rebirths) +
+			"\n\n\n\n\n\n           [s] Win! ($" + numberFormatting(1000000000000) + ")"
 
 	ebitenutil.DebugPrint(screen, playerInformation)
 
@@ -72,12 +94,12 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		screen.DrawImage(img, op)
 	}
 
-	// ebitenutil.DebugPrint(screen, "Hello, World! I'm gonna lose my marbles\nasdf")
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	clickIncrement()
 	makeCpsGoUp()
+	debugControls() // :>
 	cpsIncrement()
 
 	return 320, 240
@@ -103,13 +125,13 @@ func cpsIncrement() {
 }
 
 func rebirthing() {
-	number = 5000
+	number = 5000 * rebirths
 
 	cpsUpper = 0
 	cpsUpperPrice = 20
 	cpsMultiplier = 1
 	cpsMultiplierPrice = 5000
-	cpsToThePower = 111
+	cpsToThePower = 1
 	cpsToThePowerPrice = 800000
 }
 
@@ -130,7 +152,57 @@ func makeCpsGoUp() {
 		rebirths = rebirths + 0.5
 		rebirthing()
 
-	} else if (ebiten.IsKeyPressed(ebiten.KeyS)) && (number >= 999999999999999999) {
+	} else if (inpututil.IsKeyJustPressed(ebiten.KeyS)) && (number >= 1000000000000) {
 		creditCheck = true
 	}
 }
+
+func debugControls() {
+	if inpututil.IsKeyJustPressed(ebiten.KeyF1) {
+		cpsUpperPrice = cpsUpperPrice * 1.005
+		cpsUpper = cpsUpper + cpsUpperIncrement
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyF2) {
+		cpsMultiplierPrice = cpsMultiplierPrice * 1.03
+		cpsMultiplier = cpsMultiplier + cpsMultiplierIncrement
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyF3) {
+		cpsToThePowerPrice = math.Pow(cpsToThePowerPrice, 1.02)
+		cpsToThePower = cpsToThePower + cpsToThePowerIncrement
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyF4) {
+		rebirths = rebirths + 0.5
+	} else if inpututil.IsKeyJustPressed(ebiten.KeyF5) {
+		creditCheck = true
+	}
+}
+
+func numberFormatting(input float64) string {
+	// tl;dr
+	// 2.0e10 = 2*10^10 = 20000000000
+	// 100000 = 1*10^(numOfZeros) = 1x10^6 = 1e6
+	// but if less than 100000, don't do anything
+
+	if input > 10000000000 {
+		var convertedInput string = strconv.FormatFloat(input, 'f', 0, 64)
+		var digits int = len(convertedInput) - 1
+		return firstN(convertedInput, 1) + "e" + strconv.Itoa(digits)
+	} else {
+		return strconv.FormatFloat(input, 'f', 1, 64)
+	}
+
+}
+
+func firstN(s string, n int) string {
+	i := 0
+	for j := range s {
+		if i == n {
+			return s[:j]
+		}
+		i++
+	}
+	return s
+}
+
+/*
+func saving() {
+
+}
+*/
