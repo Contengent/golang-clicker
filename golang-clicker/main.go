@@ -7,9 +7,13 @@ import (
 	"math"
 	"strconv"
 
+	"github.com/hajimehoshi/ebiten/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/text"
+	"golang.org/x/image/font"
+	"golang.org/x/image/font/opentype"
 )
 
 type Game struct{}
@@ -61,11 +65,28 @@ var creditCheck bool = false
 var img *ebiten.Image
 
 /* var img2 *ebiten.Image */
+var (
+	mplusNormalFont font.Face
+)
 
 func init() {
 	var err error
+
+	tt, err := opentype.Parse(fonts.MPlus1pRegular_ttf)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	mplusNormalFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
+		Size:    24,
+		DPI:     36,
+		Hinting: font.HintingVertical,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	img, _, err = ebitenutil.NewImageFromFile("winner.png")
-	/*img2 = ebiten.NewImage(testButt.width, testButt.height) */
 
 	if err != nil {
 		log.Fatal(err)
@@ -95,7 +116,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			"\n[r] Rebirths cps+cps* ($" + numberFormatting(rebirthPrice, 0) + "): " + numberFormatting(rebirths, 2) +
 			"\n\n\n\n\n\n                 [s] Win! ($" + numberFormatting(winPrice, 0) + ")"
 
-	ebitenutil.DebugPrint(screen, playerInformation)
+	text.Draw(screen, playerInformation, mplusNormalFont, 0, 0, color.White)
+	//ebitenutil.DebugPrint(screen, playerInformation)
 
 	if creditCheck {
 		screen.Fill(color.RGBA{0, 0, 0, 0xff})
