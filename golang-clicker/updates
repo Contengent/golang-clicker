@@ -1,0 +1,17 @@
+### Updates v1.6
+- buffed cpsToThePowerIncrement from: 0.02 -> 0.03
+- added purchase multiplier
+- rebirthing now effects the user's clicks by 2*rebirthMultiplier
+
+## Purchase multiplier
+The purcahse multiplier makes it so you can buy however many upgrades you would like each click. Unfortunatly it doesn't change the shop prices to reflect how much it would cost, or force allow for that amount of items to be bought at once, it will instead go to the highest amount that can be bought with the current amount of $.
+It's honestly pretty useless but it's a feature none the less. I might make it so you can't hold the purchase button anymore so it has a purpose lol
+
+## Next update will likely include:
+- sound effects
+- cooler font
+
+## Next update might include:
+- more optimized code (I hope qwq)
+- buttons (idk what for :l)
+- proper ending (lol)
