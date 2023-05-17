@@ -74,6 +74,8 @@ var (
 func init() {
 	var err error
 
+	loadSave()
+	
 	tt, err := opentype.Parse(fonts.MPlus1pRegular_ttf)
 	if err != nil {
 		log.Fatal(err)
