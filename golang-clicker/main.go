@@ -38,10 +38,14 @@ var testButt ebitButton = ebitButton{
 
 var number float64 = 0
 
-var cpsUpper float64 = 0
-var cpsUpperPrice float64 = 20
-var cpsUpperPriceMulti float64 = 1.005
-var cpsUpperIncrement float64 = 1
+var cpsUpper shopItem = shopItem{
+	itemName:         "cpsUpper",
+	currentlyOwned:   0,
+	currentPrice:     20,
+	priceMultiplier:  1.005,
+	upgradeIncrement: 1,
+	upgradeKey:       ebiten.KeyQ,
+}
 
 var cpsMultiplier float64 = 1
 var cpsMultiplierPrice float64 = 5000
@@ -75,7 +79,7 @@ func init() {
 	var err error
 
 	loadSave()
-	
+
 	tt, err := opentype.Parse(fonts.MPlus1pRegular_ttf)
 	if err != nil {
 		log.Fatal(err)
@@ -112,9 +116,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	playerInformation =
 		"\nCurrent clicks: " + numberFormatting(number, 1) +
-			"\nCurrent cps: " + strconv.FormatFloat((math.Pow(((cpsUpper)*(cpsMultiplier)), cpsToThePower))+((math.Pow(((cpsUpper)*(cpsMultiplier)), cpsToThePower))*(rebirths)), 'f', 1, 64) +
+			"\nCurrent cps: " + strconv.FormatFloat((math.Pow(((cpsUpper.currentlyOwned)*(cpsMultiplier)), cpsToThePower))+((math.Pow(((cpsUpper.currentlyOwned)*(cpsMultiplier)), cpsToThePower))*(rebirths)), 'f', 1, 64) +
 			"\n[z-,x+]Shop multiplier: " + numberFormatting(purchaseMulti, 0) +
-			"\n\n[q] Current cps+ ($" + numberFormatting(cpsUpperPrice, 0) + "): " + numberFormatting(cpsUpper, 0) +
+			"\n\n[q] Current cps+ ($" + numberFormatting(cpsUpper.currentPrice, 0) + "): " + numberFormatting(cpsUpper.currentlyOwned, 0) +
 			"\n[w] Current cps* ($" + numberFormatting(cpsMultiplierPrice, 0) + "): " + numberFormatting(cpsMultiplier, 1) +
 			"\n[e] Current cps^ ($" + numberFormatting(cpsToThePowerPrice, 0) + "): " + numberFormatting(cpsToThePower, 2) +
 			"\n[r] Rebirths cps+cps* ($" + numberFormatting(rebirthPrice, 0) + "): " + numberFormatting(rebirths, 2) +
@@ -156,14 +160,14 @@ func clickIncrement() {
 }
 
 func cpsIncrement() {
-	number = number + ((math.Pow(((cpsUpper)*(cpsMultiplier)), cpsToThePower))+((math.Pow(((cpsUpper)*(cpsMultiplier)), cpsToThePower))*(rebirths)))/60
+	number = number + ((math.Pow(((cpsUpper.currentlyOwned)*(cpsMultiplier)), cpsToThePower))+((math.Pow(((cpsUpper.currentlyOwned)*(cpsMultiplier)), cpsToThePower))*(rebirths)))/60
 }
 
 func rebirthing() {
 	number = 5000 * rebirths
 
-	cpsUpper = 0
-	cpsUpperPrice = 20
+	cpsUpper.currentlyOwned = 0
+	cpsUpper.currentPrice = 20
 	cpsMultiplier = 1
 	cpsMultiplierPrice = 5000
 	cpsToThePower = 1
@@ -175,10 +179,8 @@ func shopControls() {
 	i = 0
 
 	if ebiten.IsKeyPressed(ebiten.KeyQ) {
-		for i <= int(purchaseMulti) && (number >= cpsUpperPrice) {
-			number = number - cpsUpperPrice
-			cpsUpperPrice = cpsUpperPrice * cpsUpperPriceMulti
-			cpsUpper = cpsUpper + cpsUpperIncrement
+		for i <= int(purchaseMulti) {
+			cpsUpper.purchaseItem()
 			i++
 		}
 	} else if ebiten.IsKeyPressed(ebiten.KeyW) {
@@ -222,8 +224,8 @@ func shopControls() {
 
 func debugControls() {
 	if inpututil.IsKeyJustPressed(ebiten.KeyF1) {
-		cpsUpperPrice = cpsUpperPrice * cpsUpperPriceMulti
-		cpsUpper = cpsUpper + cpsUpperIncrement
+		cpsUpper.currentPrice *= cpsUpper.priceMultiplier
+		cpsUpper.currentlyOwned += cpsUpper.upgradeIncrement
 	} else if inpututil.IsKeyJustPressed(ebiten.KeyF2) {
 		cpsMultiplierPrice = cpsMultiplierPrice * cpsMultiplierPriceMulti
 		cpsMultiplier = cpsMultiplier + cpsMultiplierIncrement
@@ -268,11 +270,11 @@ func saving() {
 
 	writer := csv.NewWriter(f)
 	var data = [][]string{
-		{"number", strconv.FormatFloat(number, 'f', 0, 64)},
-		{"cpsUpper", strconv.FormatFloat(cpsUpper, 'f', 0, 64)},
-		{"cpsMultiplier", strconv.FormatFloat(cpsMultiplier, 'f', 0, 64)},
-		{"cpsToThePower", strconv.FormatFloat(cpsToThePower, 'f', 0, 64)},
-		{"rebirths", strconv.FormatFloat(rebirths, 'f', 0, 64)},
+		{"number", strconv.FormatFloat(number, 'f', 0, 64), "69"},
+		{"cpsUpper", strconv.FormatFloat(cpsUpper.currentlyOwned, 'f', 0, 64), strconv.FormatFloat(cpsUpper.currentPrice, 'f', 0, 64)},
+		{"cpsMultiplier", strconv.FormatFloat(cpsMultiplier, 'f', 0, 64), strconv.FormatFloat(cpsMultiplierPrice, 'f', 0, 64)},
+		{"cpsToThePower", strconv.FormatFloat(cpsToThePower, 'f', 0, 64), strconv.FormatFloat(cpsToThePowerPrice, 'f', 0, 64)},
+		{"rebirths", strconv.FormatFloat(rebirths, 'f', 0, 64), "420"},
 	}
 
 	e = writer.WriteAll(data)
@@ -295,16 +297,25 @@ func loadSave() {
 		switch records[0] {
 		case "number":
 			number, _ = strconv.ParseFloat(records[1], 64)
+			break
 		case "cpsUpper":
-			cpsUpper, _ = strconv.ParseFloat(records[1], 64)
+			cpsUpper.currentlyOwned, _ = strconv.ParseFloat(records[1], 64)
+			cpsUpper.currentPrice, _ = strconv.ParseFloat(records[2], 64)
+			break
 		case "cpsMultiplier":
 			cpsMultiplier, _ = strconv.ParseFloat(records[1], 64)
+			cpsMultiplierPrice, _ = strconv.ParseFloat(records[2], 64)
+			break
 		case "cpsToThePower":
 			cpsToThePower, _ = strconv.ParseFloat(records[1], 64)
+			cpsToThePowerPrice, _ = strconv.ParseFloat(records[2], 64)
+			break
 		case "rebirths":
 			rebirths, _ = strconv.ParseFloat(records[1], 64)
+			break
 		default:
 			log.Println("what")
+			break
 		}
 	}
 
