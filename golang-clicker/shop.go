@@ -15,11 +15,14 @@ type shopItem struct {
 	upgradeKey       ebiten.Key
 }
 
-func (item *shopItem) purchaseItem() {
-	if ebiten.IsKeyPressed(item.upgradeKey) && (number >= item.currentPrice) {
-		number -= item.currentPrice
-		item.currentPrice *= item.priceMultiplier
-		item.currentlyOwned += item.upgradeIncrement
+func (item *shopItem) purchaseItem(iter int, pM int) {
+	for iter < pM && ebiten.IsKeyPressed(item.upgradeKey) {
+		if number >= item.currentPrice {
+			number -= item.currentPrice
+			item.currentPrice *= item.priceMultiplier
+			item.currentlyOwned += item.upgradeIncrement
+			iter++
+		}
 	}
 }
 
