@@ -133,8 +133,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			"\n[w] Current cps* ($" + numberFormatting(cpsMultiplier.currentPrice, 0) + "): " + numberFormatting(cpsMultiplier.currentlyOwned, 1) +
 			"\n[e] Current cps^ ($" + numberFormatting(cpsToThePower.currentPrice, 0) + "): " + numberFormatting(cpsToThePower.currentlyOwned, 2) +
 			"\n[r] Rebirths cps+cps* ($" + numberFormatting(rebirthPrice, 0) + "): " + numberFormatting(rebirths, 2) +
-			"\n\n\n\n                 [s] Win! ($" + numberFormatting(winPrice, 0) + ")" +
-			"\n                 [k/l] Save/Load"
+			"\n\n\n\n[s] Win! ($" + numberFormatting(winPrice, 0) + ")" +
+			"\n[k/l] Save/Load"
 
 	text.Draw(screen, playerInformation, mplusNormalFont, 0, 0, color.White)
 	//ebitenutil.DebugPrint(screen, playerInformation)
